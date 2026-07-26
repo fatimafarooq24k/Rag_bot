@@ -1,10 +1,18 @@
-def chunk_text(text, chunk_size = 500, max_extension = 50):
+def chunk_text(text, chunk_size = 500, overlap = 100, max_extension = 50):
+
     if not text:
         raise ValueError("Text is Empty!")
 
     if chunk_size <= 0:
         raise ValueError("The chunk size must be greater than 0")
     
+    if overlap >= chunk_size:
+        raise ValueError("Overlap should be smaller than the chunk size.")
+
+    if (overlap > chunk_size/2):
+        raise ValueError("Overlap should not be greater than half of the chunk size.")
+
+
     text_chunks = []
     start = 0
 
@@ -20,10 +28,12 @@ def chunk_text(text, chunk_size = 500, max_extension = 50):
             extension += 1
 
         chunk = text[start:end].strip()
-
         if chunk:
             text_chunks.append(chunk) 
-        start = end
+        if end == len(text):
+            break
+
+        start = end - overlap
 
     return text_chunks
 
