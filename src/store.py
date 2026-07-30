@@ -8,12 +8,27 @@ def store_data(chunks, embeddings):
 
     if not isinstance(chunks, list):
         raise TypeError("Chunks must be a List.")
-    
-    if not all(isinstance(chunk, str) for chunk in chunks):
-        raise TypeError("Each chunk must be a string.")
 
     if not chunks:
-        raise ValueError("Empty Chunk List")
+        raise ValueError("Empty Chunk Dictionary")
+
+    for chunk in chunks:
+
+        if not isinstance(chunk, dict):
+            raise TypeError("Each chunk must be a dictionary.")
+
+        if "text" not in chunk:
+            raise ValueError("Chunk is missing 'text' field.")
+
+        if "page_number" not in chunk:
+            raise ValueError("Chunk is missing 'page_number' field.")
+
+        if not isinstance(chunk["text"], str) :
+            raise TypeError("Each chunk must be a string.")
+        
+        if not isinstance(chunk["page_number"], int):
+            raise TypeError("Page number must be a valid number.")
+
     
     if len(chunks) != len(embeddings):
         raise ValueError("Chunks and embeddings should be of same size.")
@@ -58,7 +73,20 @@ def load_data():
     if not chunks:
         raise ValueError("Empty Chunk List")
     
-    if not all(isinstance(chunk, str) for chunk in chunks):
-        raise TypeError("Each chunk must be a string.")
+    for chunk in chunks:
+        if not isinstance(chunk, dict):
+            raise TypeError("Each chunk must be a dictionary.")
+
+        if "text" not in chunk:
+            raise ValueError("Chunk is missing 'text' field.")
+
+        if "page_number" not in chunk:
+            raise ValueError("Chunk is missing 'page_number' field.")
+
+        if not isinstance(chunk["text"], str):
+            raise TypeError("Each chunk must be a string.")
+        
+        if not isinstance(chunk["page_number"], int):
+            raise TypeError("Page number must be a valid number.")
 
     return index, chunks
