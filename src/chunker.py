@@ -21,7 +21,7 @@ def chunk_text(text, chunk_size = 500, overlap = 100, max_extension = 50):
         extension = 0
         while (
             end < len(text)
-             and text[end] != " " 
+             and text[end].isspace()
              and extension < max_extension
         ): 
             end += 1
@@ -34,6 +34,11 @@ def chunk_text(text, chunk_size = 500, overlap = 100, max_extension = 50):
             break
 
         start = end - overlap
+        while (
+            start != 0
+            and text[start-1].isspace()
+               ):
+            start -= 1
 
     return text_chunks
 
