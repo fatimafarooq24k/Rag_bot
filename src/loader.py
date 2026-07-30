@@ -15,17 +15,22 @@ def extract_text_from_file(path_to_file):
 
     try:
         reader = PdfReader(path)
-        whole_text = ""
+        pages = []
 
-        for page in reader.pages:
+        for page_number, page in enumerate(reader.pages, start=1):
             page_text = page.extract_text()
 
             if page_text is None:
                 continue
 
-            whole_text += page_text + "\n"
+            pages.append(
+                {
+                    "page_number" : page_number,
+                    "text" : page_text
+            }
+            )
 
-        return whole_text
+        return pages
     
     except Exception as e:
         raise RuntimeError(f"Error reading file: {e}") from e
