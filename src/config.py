@@ -14,6 +14,9 @@ HNSW_EF_CONSTRUCTION = 200
 
 TOP_K = 12
 
+# Reranker Configuration 
+RERANK_TOP_K = 6
+
 # Generator Configurations
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
