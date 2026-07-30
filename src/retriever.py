@@ -30,6 +30,7 @@ def find_relevant_chunks(user_query, top_k=5):
     indices = indices.flatten()
     retrieved_chunks = []
     for chunk_index in indices:
+
         retrieved_chunks.append(chunks[chunk_index])
 
     return retrieved_chunks
