@@ -3,9 +3,13 @@ from src.llm import generate_response
 from src.reranker import Reranker
 import src.config as cnfg
 
-reranker = Reranker()
+reranker = None
 
 def generate_answer(query):
+    global reranker
+
+    if reranker is None:
+        reranker = Reranker()
 
     if not isinstance(query, str):
         raise TypeError("Your prompt must be String.")
@@ -42,6 +46,14 @@ def generate_answer(query):
     {query}
 
     Answer:
+    Answer the question completely.
+
+    For every requested topic:
+    - Give a heading.
+    - Give 3–8 bullet points.
+    - Mention page numbers.
+    - Combine information from multiple chunks.
+    - Do not stop until every topic is covered.
 
     '''
 

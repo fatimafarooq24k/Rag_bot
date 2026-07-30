@@ -1,8 +1,9 @@
 from sentence_transformers import CrossEncoder
+from src.config import RERANK_MODEL
 
 class Reranker:
     def __init__(self):
-        self.model = CrossEncoder("BAAI/bge-reranker-v2-m3")
+        self.model = CrossEncoder(RERANK_MODEL)
 
     def rerank(self, query, retrieved_chunks, top_k = 6):
 
@@ -10,7 +11,7 @@ class Reranker:
 
         for chunk in retrieved_chunks:
             pairs.append(
-                (query, chunk)
+                (query, chunk["text"])
             )
 
         scores = self.model.predict(pairs)

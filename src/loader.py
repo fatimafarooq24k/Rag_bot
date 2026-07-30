@@ -20,7 +20,8 @@ def extract_text_from_file(path_to_file):
         for page_number, page in enumerate(reader.pages, start=1):
             page_text = page.extract_text()
 
-            if page_text is None:
+            if not page_text or not page_text.strip():
+                print(f"Skipping empty page {page_number}")
                 continue
 
             pages.append(

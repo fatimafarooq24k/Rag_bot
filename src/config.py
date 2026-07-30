@@ -16,6 +16,7 @@ TOP_K = 12
 
 # Reranker Configuration 
 RERANK_TOP_K = 6
+RERANK_MODEL = "cross-encoder/ms-marco-MiniLM-L-6-v2"
 
 # Generator Configurations
 
@@ -26,4 +27,4 @@ if GROQ_API_KEY is None or GROQ_API_KEY == "":
 
 MODEL = "openai/gpt-oss-20b"
 TEMPERATURE = 0.3
-MAX_TOKENS = 512
+MAX_TOKENS = 1024

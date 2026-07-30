@@ -1,5 +1,6 @@
 from src.generator import generate_answer
 from src.index import index_document
+import traceback
 
 def main():
 
@@ -11,7 +12,7 @@ def main():
         received_info = index_document(path)
     except Exception as e:
         print("Document processing failed!")
-        print(e)
+        traceback.print_exc()
         return
     
     print("Document Processing status: ", received_info["status"])
@@ -46,7 +47,7 @@ def main():
 
         except Exception as e:
             print("An error occurred. Try Again!")
-            print(e)
+            traceback.print_exc()
 
 if __name__ == "__main__":
     main()
