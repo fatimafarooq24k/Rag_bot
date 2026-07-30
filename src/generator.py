@@ -1,6 +1,9 @@
 from src.retriever import find_relevant_chunks
 from src.llm import generate_response
+from src.reranker import Reranker
 import src.config as cnfg
+
+reranker = Reranker()
 
 def generate_answer(query):
 
@@ -12,8 +15,10 @@ def generate_answer(query):
 
     retrieved_chunks = find_relevant_chunks(query, cnfg.TOP_K)
 
+    reranked_chunks = reranker.rerank(query, retrieved_chunks, cnfg.RERANK_TOP_K)
+
     context = ""
-    for chunk in retrieved_chunks:
+    for chunk in reranked_chunks:
         context += (
             f"(Page: {chunk['page_number']})\n"
             f"{chunk['text']}\n\n" 
