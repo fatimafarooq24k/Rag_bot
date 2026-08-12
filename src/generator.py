@@ -19,6 +19,16 @@ def generate_answer(query):
 
     retrieved_chunks = find_relevant_chunks(query, cnfg.TOP_K)
 
+    unique_chunks = []
+    seen = set()
+    for chunk in retrieved_chunks:
+        key = (chunk["page_number"], chunk["text"])
+        if key not in seen:
+            unique_chunks.append(chunk)
+            seen.add(key)
+
+    retrieved_chunks = unique_chunks
+
     reranked_chunks = reranker.rerank(query, retrieved_chunks, cnfg.RERANK_TOP_K)
 
     context = ""
@@ -36,9 +46,12 @@ def generate_answer(query):
     3- If multiple chunks discuss the same topic, combine them into one answer.
     4- If information is partial, say that it is partial.
     5- Do not invent facts.
-    6- Whenever you use information, include its page number in the answer.
-    7- If multiple pages support the same point, cite all of them.
-    
+    6- Whenever you use information, cite it at the end of the sentence in exactly this format:
+    [Page X]
+    7- If multiple pages support the same statement, cite them exactly like this:
+    [Pages X, Y, Z]
+    8- Never use any other citation style such as (Page 1), Page 1, 【1】, or superscripts.
+        
     Context:
     {context}
     

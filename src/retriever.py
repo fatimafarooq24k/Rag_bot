@@ -17,8 +17,9 @@ def find_relevant_chunks(user_query, top_k=5):
     if top_k <= 0:
         raise ValueError("Enter a valid search number.")
 
+    user_query_with_instruction = "Represent this sentence for searching relevant passages: " + user_query
 
-    query_embedding = create_embeddings([user_query])
+    query_embedding = create_embeddings([user_query_with_instruction])
 
     faiss_index, chunks = load_data()
 

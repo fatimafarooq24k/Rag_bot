@@ -10,6 +10,11 @@ CHUNKS_PATH = "data/processed/chunks.pkl"
 
 HNSW_M = 32
 HNSW_EF_CONSTRUCTION = 200
+HNSW_EF_SEARCH = 128
+
+# Embedder Configuration
+EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5"
+
 # Retriever Configuration
 
 TOP_K = 12
@@ -26,5 +31,5 @@ if GROQ_API_KEY is None or GROQ_API_KEY == "":
     raise ValueError("No API key found.")
 
 MODEL = "openai/gpt-oss-20b"
-TEMPERATURE = 0.3
-MAX_TOKENS = 1024
+TEMPERATURE = 0.4
+MAX_TOKENS = 4096

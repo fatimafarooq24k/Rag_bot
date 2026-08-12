@@ -1,12 +1,12 @@
 from sentence_transformers import SentenceTransformer
+import src.config as cnfg
 
 model = None
 def get_model():
     global model
     if model is None:
         model = SentenceTransformer(
-            "all-MiniLM-L6-v2",
-            local_files_only=True
+            cnfg.EMBEDDING_MODEL
         )
     return model
 
@@ -22,7 +22,7 @@ def create_embeddings(chunks):
         raise TypeError("Each chunk must be a string.")
     
     model = get_model()
-    
+
     embeddings = model.encode(
         chunks,
         convert_to_numpy=True

@@ -21,7 +21,6 @@ def extract_text_from_file(path_to_file):
             page_text = page.extract_text()
 
             if not page_text or not page_text.strip():
-                print(f"Skipping empty page {page_number}")
                 continue
 
             pages.append(
