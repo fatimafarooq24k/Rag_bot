@@ -45,6 +45,7 @@ def store_data(chunks, embeddings):
     dimension = embeddings.shape[1]
     index = faiss.IndexHNSWFlat(dimension, cf.HNSW_M)
     index.hnsw.efConstruction = cf.HNSW_EF_CONSTRUCTION
+    
 
     embeddings = embeddings.astype(np.float32)
     index.add(embeddings)
@@ -88,5 +89,8 @@ def load_data():
         
         if not isinstance(chunk["page_number"], int):
             raise TypeError("Page number must be a valid number.")
+
+    index = faiss.read_index(cf.INDEX_PATH)
+    index.hnsw.efSearch = cf.HNSW_EF_SEARCH
 
     return index, chunks
