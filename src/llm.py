@@ -1,7 +1,10 @@
 from groq import Groq
-import src.config as cnfg
+from src.core.config import settings
+import logging
 
-client = Groq(api_key=cnfg.GROQ_API_KEY)
+logger = logging.getLogger(__name__)
+
+client = Groq(api_key=settings.groq_api_key)
 
 def generate_response(prompt):
 
@@ -12,15 +15,17 @@ def generate_response(prompt):
         raise ValueError("Please enter the prompt.")
 
     model_check = client.chat.completions.create(
-        model=cnfg.MODEL,
+        model=settings.model,
         messages = [
            { 
             "role" : "user",
             "content" : prompt
             }
         ],
-        temperature=cnfg.TEMPERATURE,
-        max_tokens=cnfg.MAX_TOKENS
+        temperature=settings.temperature,
+        max_tokens=settings.max_tokens,
+        reasoning_effort="low"
     )
 
+    logger.info("LLM response generated successfully.")
     return model_check.choices[0].message.content

@@ -1,47 +1,27 @@
-from src.chunker import chunk_text
+from src.rag.chunker import chunk_text
+import pytest
 
-print("Test 1: Normal Chunking")
-text = "The big brown cat sat on the mat and ate a rat. After that it went on with chasing another rat."
-chunks = chunk_text(text, chunk_size=12)
+valid_text = "The Blossom of flowers in spring is truely a wonderful sight."
+empty_text = ""
+invalid_text = 45
 
-for i, chunk in enumerate(chunks):
-    print(f"Chunk {i+1}: ")
-    print(chunk)
-    print("-----------")
+def test_normal_chunking():
+    chunks = chunk_text(valid_text, chunk_size = 7)
+    assert len(chunks) == 7
 
-print("--------------------------------")
+def test_invalid_chunk_size():
+     with pytest.raises(ValueError):
+         chunk_text(valid_text, chunk_size=-1)
 
-print("Test 2: Invalid Chuck Size")
+def test_larger_than_text_chunk_size():
+    chunks = chunk_text(valid_text, chunk_size=90)
+    assert len(chunks) == len()
 
-text = "The Blossom of flowers in spring is truely a wonderful sight."
+def test_empty_text():
+    with pytest.raises(ValueError):
+        chunk_text(empty_text, chunk_size=5)
 
-try:
-    chunks = chunk_text(text, chunk_size=-1)
-    print(chunks)
-except ValueError as e:
-    print(f"Error caught: {e}")
+def test_invalid_text_type():
+    with pytest.raises(TypeError):
+        chunk_text(invalid_text)
 
-print("--------------------------------")
-
-print("Test 3: Chunk Size Larger Than Text")
-
-text = "Hello World!"
-try:
-    chunks = chunk_text(text, chunk_size=25)
-    print(chunks)
-except ValueError as e:
-    print(f"Error caught: {e}")
-
-print("--------------------------------")
-
-print("Test 4: Empty Text")
-
-text = ""
-try:
-    chunks = chunk_text(text, chunk_size=12)
-    print(chunks)
-except ValueError as e:
-    print(f"Error caught: {e}")
-
-
-print("--------------------------------")

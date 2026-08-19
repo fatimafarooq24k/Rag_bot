@@ -1,0 +1,118 @@
+.app {
+    min-height: 100vh;
+    background: #f5f7fb;
+    color: #1f2937;
+}
+
+.header {
+    text-align: center;
+    padding: 50px 20px 30px;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 40px;
+}
+
+.header p {
+    color: #6b7280;
+    font-size: 18px;
+}
+
+.main-container {
+    width: 90%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding-bottom: 60px;
+}
+
+.upload-section,
+.question-section,
+.answer-section {
+    background: white;
+    padding: 25px;
+    margin-top: 20px;
+    border-radius: 12px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+}
+
+.upload-section h2,
+.question-section h2,
+.answer-section h2 {
+    margin-top: 0;
+}
+
+input[type="file"] {
+    width: 100%;
+    margin: 15px 0;
+}
+
+textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    resize: vertical;
+    font-family: inherit;
+    font-size: 15px;
+}
+
+button {
+    margin-top: 15px;
+    padding: 11px 20px;
+    border: none;
+    border-radius: 8px;
+    background: #2563eb;
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+    background: #1d4ed8;
+}
+
+button:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+}
+
+.file-name {
+    color: #374151;
+}
+
+.error-message {
+    color: #dc2626;
+    margin-top: 15px;
+}
+
+.success-message {
+    color: #16a34a;
+    margin-top: 15px;
+}
+
+.status-message {
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 20px;
+    font-weight: 500;
+}
+
+.status-message.ready {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-message.waiting {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.answer-box {
+    white-space: pre-wrap;
+    line-height: 1.7;
+    padding: 20px;
+    background: #f9fafb;
+    border-radius: 8px;
+}

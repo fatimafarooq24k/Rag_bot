@@ -1,10 +1,65 @@
+# =========================
+# Python
+# =========================
+
 .venv/
+venv/
 __pycache__/
-*.pyc
+*.py[cod]
+*.pyo
+
+# Environment variables
 .env
+.env.*
+!.env.example
+
+# =========================
+# Data / RAG
+# =========================
+
 chroma_db/
 *.db
+
 data/raw/*
 data/processed/*
+
 !data/raw/.gitkeep
 !data/processed/.gitkeep
+
+# =========================
+# Logs
+# =========================
+
+logs/
+*.log
+
+# =========================
+# Frontend - React / Vite
+# =========================
+
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# =========================
+# IDE / Editors
+# =========================
+
+.vscode/
+.idea/
+
+# =========================
+# OS
+# =========================
+
+.DS_Store
+Thumbs.db
+
+# =========================
+# Testing / Coverage
+# =========================
+
+.pytest_cache/
+.coverage
+htmlcov/
+.coverage.*

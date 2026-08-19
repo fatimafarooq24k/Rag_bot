@@ -1,13 +1,17 @@
 from sentence_transformers import SentenceTransformer
-import src.config as cnfg
+from src.core.config import settings
+import logging
+
+logger = logging.getLogger(__name__)
 
 model = None
 def get_model():
     global model
     if model is None:
         model = SentenceTransformer(
-            cnfg.EMBEDDING_MODEL
+            settings.embedding_model
         )
+        logger.info("Model Loading complete.")
     return model
 
 def create_embeddings(chunks):
@@ -27,5 +31,8 @@ def create_embeddings(chunks):
         chunks,
         convert_to_numpy=True
         )
+
+    logger.info("Embedding generation completed. Total embeddings: %d",
+                len(embeddings))
 
     return embeddings

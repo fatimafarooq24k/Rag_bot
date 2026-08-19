@@ -1,53 +1,32 @@
-from src.generator import generate_answer
-from src.index import index_document
-import traceback
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
-def main():
+from src.api.routes import router
+from src.utils.logging import setup_logging
 
-    #step 1: Process Document
+import logging
 
-    path = input("Please provide your document path here: ")
-    print("Document Loading Initiated...")
-    try:
-        received_info = index_document(path)
-    except Exception as e:
-        print("Document processing failed!")
-        traceback.print_exc()
-        return
-    
-    print("Document Processing status: ", received_info["status"])
+setup_logging()
+logger = logging.getLogger(__name__)
 
-    print("Summary")
-    print(f"Chunks created: {received_info['chunks_created']}")
-    print(f"Embeddings created: {received_info['embeddings_created']}")
-    print("Document created.\n You can now start chatting.")
-    print("\n***\t-------------------------------------------------\t***\n")
+logger.info("PDF Q/A Bot API Initialized.")
 
+app = FastAPI(
+    title="PDF Q/A Bot",
+    description="Upload PDF and ask questions from it using RAG.",
+    version="1.0.0"
+)
 
-    #step 2: Start Chatting
-    print('''Hello! I'm your PDF Q/A Bot.
-            Ask me questions about your uploaded document.
-            Type "exit" to quit.''')
-    while True: 
-        try:
-            print("\n------------------------\n")
-            query = input("Ask your question: ") 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173"
+    ],
+    allow_credentials=True,
+    allow_headers=["*"],
+    allow_methods=["*"]
 
-            if query.strip() == "":
-                print("Please write something")
-                continue
+)
 
-            if query.lower() == "exit":
-                print("Thank you for using PDF Q/A Bot.\nGoodbye!")
-                break
-
-            answer = generate_answer(query)
-
-            print(answer)
-
-        except Exception as e:
-            print("An error occurred. Try Again!")
-            traceback.print_exc()
-
-if __name__ == "__main__":
-    main()
+app.include_router(router)

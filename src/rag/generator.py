@@ -1,15 +1,19 @@
-from src.retriever import find_relevant_chunks
+from src.rag.retriever import find_relevant_chunks
 from src.llm import generate_response
 from src.reranker import Reranker
-import src.config as cnfg
+from src.core.config import settings
+import logging
+
+logger = logging.getLogger(__name__)
 
 reranker = None
 
-def generate_answer(query):
+def generate_answer(doc_id, query):
     global reranker
 
     if reranker is None:
         reranker = Reranker()
+        logger.info("Loaded reranker model.")
 
     if not isinstance(query, str):
         raise TypeError("Your prompt must be String.")
@@ -17,7 +21,7 @@ def generate_answer(query):
     if query.strip() == "":
         raise ValueError("Please enter a prompt.")
 
-    retrieved_chunks = find_relevant_chunks(query, cnfg.TOP_K)
+    retrieved_chunks = find_relevant_chunks(doc_id, query, settings.top_k)
 
     unique_chunks = []
     seen = set()
@@ -29,7 +33,14 @@ def generate_answer(query):
 
     retrieved_chunks = unique_chunks
 
-    reranked_chunks = reranker.rerank(query, retrieved_chunks, cnfg.RERANK_TOP_K)
+    if not retrieved_chunks:
+        logger.warning("No relevant chunks found for the query.")
+
+    logger.info("Unique chunks retrieved. Total chunks: %d", len(retrieved_chunks))
+
+    reranked_chunks = reranker.rerank(query, retrieved_chunks, settings.rerank_top_k)
+
+    logger.info("Reranking completed. Chunks reranked: %d", len(reranked_chunks))
 
     context = ""
     for chunk in reranked_chunks:
@@ -51,7 +62,7 @@ def generate_answer(query):
     7- If multiple pages support the same statement, cite them exactly like this:
     [Pages X, Y, Z]
     8- Never use any other citation style such as (Page 1), Page 1, 【1】, or superscripts.
-        
+    9- Give the name of document from which you fetched answer in the format: Source (abc)
     Context:
     {context}
     
@@ -71,6 +82,8 @@ def generate_answer(query):
     '''
 
     response = generate_response(prompt)
+
+    logger.info("Response generated successfully.")
 
     return response
 

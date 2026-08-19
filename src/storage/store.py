@@ -1,16 +1,24 @@
 import faiss
-import src.config as cf
 import pickle as pkl
 import numpy as np
-from pathlib import Path
+import logging
 
-def store_data(chunks, embeddings):
+from src.core.config import settings
+from src.storage.paths import get_document_paths
+
+logger = logging.getLogger(__name__)
+
+
+def store_data(doc_id, chunks, embeddings):
 
     if not isinstance(chunks, list):
         raise TypeError("Chunks must be a List.")
 
     if not chunks:
         raise ValueError("Empty Chunk Dictionary")
+
+    paths = get_document_paths(doc_id)
+    paths.folder.mkdir(parents=True, exist_ok=True)
 
     for chunk in chunks:
 
@@ -43,29 +51,37 @@ def store_data(chunks, embeddings):
         raise ValueError("Embeddings should be 2D")
 
     dimension = embeddings.shape[1]
-    index = faiss.IndexHNSWFlat(dimension, cf.HNSW_M)
-    index.hnsw.efConstruction = cf.HNSW_EF_CONSTRUCTION
+    index = faiss.IndexHNSWFlat(dimension, settings.hnsw_m)
+    index.hnsw.efConstruction = settings.hnsw_ef_construction
+
+    logger.info("Index initialized.")
     
 
     embeddings = embeddings.astype(np.float32)
     index.add(embeddings)
 
-    faiss.write_index(index, cf.INDEX_PATH)
+    logger.info("Embeddings stored successfully.")
 
-    with open(cf.CHUNKS_PATH, "wb") as file:
+    faiss.write_index(index, str(paths.index))
+
+    with open(paths.chunks, "wb") as file:
         pkl.dump(chunks, file)
 
-def load_data():
+    logger.info("Chunks stored successfully")
 
-    if not Path(cf.INDEX_PATH).is_file():
-        raise FileNotFoundError(f"File does not exist at path {cf.INDEX_PATH}")
+def load_data(doc_id):
 
-    if not Path(cf.CHUNKS_PATH).is_file():
-        raise FileNotFoundError(f"File does not exist at path {cf.CHUNKS_PATH}")
+    paths = get_document_paths(doc_id)
 
-    index = faiss.read_index(cf.INDEX_PATH)
+    if not paths.index.is_file():
+        raise FileNotFoundError(f"Index does not exist for document id: {doc_id}")
 
-    with open(cf.CHUNKS_PATH, "rb") as file:
+    if not paths.chunks.is_file():
+        raise FileNotFoundError(f"Chunks do not exist for document id: {doc_id}")
+
+    index = faiss.read_index(str(paths.index))
+
+    with open(paths.chunks, "rb") as file:
         chunks = pkl.load(file)
 
     if not isinstance(chunks, list):
@@ -90,7 +106,8 @@ def load_data():
         if not isinstance(chunk["page_number"], int):
             raise TypeError("Page number must be a valid number.")
 
-    index = faiss.read_index(cf.INDEX_PATH)
-    index.hnsw.efSearch = cf.HNSW_EF_SEARCH
+    index.hnsw.efSearch = settings.hnsw_ef_search
+
+    logger.info("Chunks loaded successfully.")
 
     return index, chunks

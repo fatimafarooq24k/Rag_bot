@@ -1,5 +1,8 @@
 from pypdf import PdfReader
 from pathlib import Path
+import logging
+
+logger = logging.getLogger(__name__)
 
 def extract_text_from_file(path_to_file):
     path = Path(path_to_file)
@@ -21,6 +24,8 @@ def extract_text_from_file(path_to_file):
             page_text = page.extract_text()
 
             if not page_text or not page_text.strip():
+                logger.warning("Page %d has no extractable information. Skipping page %d",
+                               page_number)
                 continue
 
             pages.append(
@@ -29,8 +34,9 @@ def extract_text_from_file(path_to_file):
                     "text" : page_text
             }
             )
-
+        logger.info("Document Text Loaded Successfully!")
         return pages
     
     except Exception as e:
-        raise RuntimeError(f"Error reading file: {e}") from e
+        logger.exception("Error Occured While Loading the Document.")
+        raise RuntimeError(f"Error reading file: {e}")

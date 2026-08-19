@@ -1,3 +1,7 @@
+import logging
+
+logger = logging.getLogger(__name__)
+
 def chunk_text(text, chunk_size = 500, overlap = 100, max_extension = 50):
 
     if not text:
