@@ -1,6 +1,3 @@
-Absolutely. Here is the **raw Markdown content** you can copy directly into your `README.md` file.
-
-````markdown
 # Multi-Document RAG PDF Q&A System
 
 A document-based Retrieval-Augmented Generation (RAG) system that allows users to upload PDF documents, index them independently, and ask questions specifically from a selected document.
@@ -49,7 +46,7 @@ The project includes a React-based interface with:
 
 ---
 
-# Architecture
+## Architecture
 
 The system follows a document-specific RAG pipeline:
 
@@ -83,11 +80,11 @@ The system follows a document-specific RAG pipeline:
              ▼                                   │
     Per-Document Storage                         ▼
                                           Answer + Citations
-````
+```
 
 ---
 
-# Multi-Document Architecture
+## Multi-Document Architecture
 
 Unlike a single-document RAG system, this project does **not** use one global FAISS index.
 
@@ -127,7 +124,7 @@ Document B is never searched for that request.
 
 ---
 
-# Project Structure
+## Project Structure
 
 ```text
 Rag_bot/
@@ -196,9 +193,9 @@ Rag_bot/
 
 ---
 
-# RAG Pipeline
+## RAG Pipeline
 
-## 1. Document Upload
+### 1. Document Upload
 
 The user uploads a PDF through the frontend.
 
@@ -208,9 +205,7 @@ POST /documents
 
 The backend validates the file and starts document processing.
 
----
-
-## 2. Document Identification
+### 2. Document Identification
 
 A unique UUID is generated for every document.
 
@@ -221,15 +216,11 @@ doc_id:
 8d7f3c3e-7f5d-4e7a-b6c1-...
 ```
 
----
-
-## 3. Text Extraction
+### 3. Text Extraction
 
 PDF text is extracted using `pypdf`.
 
----
-
-## 4. Chunking
+### 4. Chunking
 
 The extracted text is divided into smaller chunks.
 
@@ -244,15 +235,11 @@ Chunks retain metadata such as:
 
 This allows the generated answer to reference the original PDF pages.
 
----
-
-## 5. Embedding Generation
+### 5. Embedding Generation
 
 Each chunk is converted into a numerical vector using a sentence-transformer embedding model.
 
----
-
-## 6. Vector Storage
+### 6. Vector Storage
 
 The embeddings are stored in a document-specific FAISS index.
 
@@ -266,41 +253,35 @@ The corresponding chunks are stored separately:
 processed/<doc_id>/chunks.pkl
 ```
 
----
-
-## 7. Retrieval
+### 7. Retrieval
 
 When a user asks a question, the question is converted into an embedding.
 
 FAISS searches the selected document's vector index and retrieves the most relevant chunks.
 
----
-
-## 8. Reranking
+### 8. Reranking
 
 The initially retrieved chunks are reranked using a CrossEncoder.
 
 This improves the quality of the context passed to the language model.
 
----
-
-## 9. LLM Generation
+### 9. LLM Generation
 
 The reranked context is passed to the configured LLM through the Groq API.
 
 The generation prompt instructs the model to:
 
-* Answer only from the provided context
-* Avoid inventing information
-* Combine relevant chunks
-* Mention page numbers
-* Clearly indicate when information is unavailable
+- Answer only from the provided context
+- Avoid inventing information
+- Combine relevant chunks
+- Mention page numbers
+- Clearly indicate when information is unavailable
 
 ---
 
-# API Endpoints
+## API Endpoints
 
-## Health
+### Health
 
 ```http
 GET /
@@ -314,11 +295,9 @@ GET /health
 
 Returns API health status.
 
----
+### Documents
 
-## Documents
-
-### Upload Document
+**Upload Document**
 
 ```http
 POST /documents
@@ -326,7 +305,7 @@ POST /documents
 
 Uploads and indexes a PDF.
 
-### List Documents
+**List Documents**
 
 ```http
 GET /documents
@@ -334,7 +313,7 @@ GET /documents
 
 Returns metadata for all indexed documents.
 
-### Get Document
+**Get Document**
 
 ```http
 GET /documents/{doc_id}
@@ -342,7 +321,7 @@ GET /documents/{doc_id}
 
 Returns metadata for a specific document.
 
-### Delete Document
+**Delete Document**
 
 ```http
 DELETE /documents/{doc_id}
@@ -350,9 +329,7 @@ DELETE /documents/{doc_id}
 
 Deletes a document and its associated storage.
 
----
-
-## Document Q&A
+### Document Q&A
 
 ```http
 POST /documents/{doc_id}/ask
@@ -370,17 +347,17 @@ Example request:
 
 ---
 
-# Metadata
+## Metadata
 
 Each document maintains metadata such as:
 
-* Filename
-* Document ID
-* Upload timestamp
-* Processing status
-* Number of chunks
-* Number of embeddings
-* Additional processing information
+- Filename
+- Document ID
+- Upload timestamp
+- Processing status
+- Number of chunks
+- Number of embeddings
+- Additional processing information
 
 Example:
 
@@ -396,44 +373,39 @@ Example:
 
 ---
 
-# Technologies
+## Technologies
 
-## Backend
+**Backend**
+- Python
+- FastAPI
+- Pydantic
+- Uvicorn
 
-* Python
-* FastAPI
-* Pydantic
-* Uvicorn
+**RAG / NLP**
+- Sentence Transformers
+- CrossEncoder
+- FAISS
+- NumPy
+- pypdf
 
-## RAG / NLP
+**LLM**
+- Groq API
 
-* Sentence Transformers
-* CrossEncoder
-* FAISS
-* NumPy
-* pypdf
+**Frontend**
+- React
+- Vite
+- JSX
+- Framer Motion
+- Lucide React
 
-## LLM
-
-* Groq API
-
-## Frontend
-
-* React
-* Vite
-* JSX
-* Framer Motion
-* Lucide React
-
-## Testing
-
-* Pytest
+**Testing**
+- Pytest
 
 ---
 
-# Installation
+## Installation
 
-## 1. Clone the Repository
+### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/fatimafarooq24k/Rag_bot.git
@@ -442,7 +414,7 @@ cd Rag_bot
 
 ---
 
-# Backend Setup
+## Backend Setup
 
 Create a virtual environment:
 
@@ -464,7 +436,7 @@ pip install -r requirements.txt
 
 ---
 
-# Environment Variables
+## Environment Variables
 
 Create a `.env` file based on `.env.example`.
 
@@ -478,7 +450,7 @@ Never commit your actual `.env` file.
 
 ---
 
-# Run the Backend
+## Run the Backend
 
 Start FastAPI:
 
@@ -500,7 +472,7 @@ http://127.0.0.1:8000/docs
 
 ---
 
-# Frontend Setup
+## Frontend Setup
 
 Navigate to the frontend:
 
@@ -528,7 +500,7 @@ http://localhost:5173
 
 ---
 
-# Example Workflow
+## Example Workflow
 
 ```text
 1. Start FastAPI
@@ -564,74 +536,74 @@ http://localhost:5173
 
 ---
 
-# Current Development Status
+## Current Development Status
 
 ### Completed
 
-* [x] PDF document loading
-* [x] Text extraction
-* [x] Text chunking
-* [x] Embedding generation
-* [x] FAISS vector storage
-* [x] HNSW-based similarity search
-* [x] CrossEncoder reranking
-* [x] LLM response generation
-* [x] Document UUID architecture
-* [x] Per-document storage
-* [x] Document metadata
-* [x] Document listing
-* [x] Document retrieval
-* [x] Document deletion endpoint
-* [x] FastAPI API structure
-* [x] React frontend structure
-* [x] Document management UI
-* [x] Chat interface
+- [x] PDF document loading
+- [x] Text extraction
+- [x] Text chunking
+- [x] Embedding generation
+- [x] FAISS vector storage
+- [x] HNSW-based similarity search
+- [x] CrossEncoder reranking
+- [x] LLM response generation
+- [x] Document UUID architecture
+- [x] Per-document storage
+- [x] Document metadata
+- [x] Document listing
+- [x] Document retrieval
+- [x] Document deletion endpoint
+- [x] FastAPI API structure
+- [x] React frontend structure
+- [x] Document management UI
+- [x] Chat interface
 
 ### In Progress
 
-* [ ] Complete frontend-backend integration
-* [ ] Complete document-specific Q&A integration
-* [ ] Propagate `doc_id` through retrieval and generation
-* [ ] Final API testing
-* [ ] Frontend error handling and polish
+- [ ] Complete frontend-backend integration
+- [ ] Complete document-specific Q&A integration
+- [ ] Propagate `doc_id` through retrieval and generation
+- [ ] Final API testing
+- [ ] Frontend error handling and polish
 
 ### Planned
 
-* [ ] Streaming LLM responses
-* [ ] Conversation history
-* [ ] Authentication
-* [ ] Persistent database for document metadata
-* [ ] Background document processing
-* [ ] Progress tracking during indexing
-* [ ] Support for additional document formats
-* [ ] Hybrid keyword + vector retrieval
-* [ ] Improved citation handling
-* [ ] Docker containerization
-* [ ] CI/CD
-* [ ] Cloud deployment
+- [ ] Streaming LLM responses
+- [ ] Conversation history
+- [ ] Authentication
+- [ ] Persistent database for document metadata
+- [ ] Background document processing
+- [ ] Progress tracking during indexing
+- [ ] Support for additional document formats
+- [ ] Hybrid keyword + vector retrieval
+- [ ] Improved citation handling
+- [ ] Docker containerization
+- [ ] CI/CD
+- [ ] Cloud deployment
 
 ---
 
-# Project Goal
+## Project Goal
 
 The goal of this project is to build a practical, modular, and scalable Retrieval-Augmented Generation system rather than a simple PDF chatbot.
 
 The architecture separates:
 
-* Document processing
-* Embedding generation
-* Vector retrieval
-* Reranking
-* LLM generation
-* Storage
-* API services
-* Frontend presentation
+- Document processing
+- Embedding generation
+- Vector retrieval
+- Reranking
+- LLM generation
+- Storage
+- API services
+- Frontend presentation
 
 This separation makes the system easier to test, maintain, extend, and eventually deploy.
 
 ---
 
-# Why Multi-Document RAG?
+## Why Multi-Document RAG?
 
 A traditional PDF chatbot often works with a single global document or vector index.
 
@@ -639,25 +611,20 @@ This project uses an isolated index for every document.
 
 This provides:
 
-* Better document isolation
-* More predictable retrieval
-* Easier document deletion
-* Easier document management
-* Independent indexing
-* Reduced risk of retrieving information from the wrong document
-* A cleaner foundation for future scaling
+- Better document isolation
+- More predictable retrieval
+- Easier document deletion
+- Easier document management
+- Independent indexing
+- Reduced risk of retrieving information from the wrong document
+- A cleaner foundation for future scaling
 
 ---
 
-# Author
+## Author
 
 **Fatima Farooq**
 
 BS Artificial Intelligence
 
 This project is being developed as a hands-on implementation of Retrieval-Augmented Generation, vector search, LLM-based question answering, backend API development, and full-stack AI application development.
-
-```
-
-**One thing before you commit it:** your actual current folder structure may differ slightly from the example above, so after your Git push we can update the tree to exactly match your repository.
-```
