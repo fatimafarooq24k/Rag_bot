@@ -1,13 +1,5 @@
-import {
-  useEffect,
-  useRef,
-  useState
-} from "react";
-
-import {
-  motion,
-  AnimatePresence
-} from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 import {
   Send,
@@ -17,39 +9,21 @@ import {
 } from "lucide-react";
 
 import MessageBubble from "./MessageBubble";
+import MetadataBar from "./MetadataBar";
 
 
-function ChatWindow({
-  document,
-  onAsk
-}) {
+function ChatWindow({ document, onAsk, messages, onUpdateMessages }) {
 
-  const [messages, setMessages] =
-    useState([]);
+  const [question, setQuestion] = useState("");
+  const [asking, setAsking] = useState(false);
 
-  const [question, setQuestion] =
-    useState("");
+  const messagesEndRef = useRef(null);
 
-  const [asking, setAsking] =
-    useState(false);
-
-  const messagesEndRef =
-    useRef(null);
-
+  // NOTE: no more "clear messages on doc change" effect —
+  // messages now come from the parent, keyed by doc_id.
 
   useEffect(() => {
-
-    setMessages([]);
-
-  }, [document.doc_id]);
-
-
-  useEffect(() => {
-
-    messagesEndRef.current?.scrollIntoView({
-      behavior: "smooth"
-    });
-
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, asking]);
 
 
@@ -57,40 +31,23 @@ function ChatWindow({
 
     event.preventDefault();
 
-    const trimmed =
-      question.trim();
-
-    if (
-      !trimmed ||
-      asking
-    ) {
-      return;
-    }
-
+    const trimmed = question.trim();
+    if (!trimmed || asking) return;
 
     setQuestion("");
 
-    setMessages((previous) => [
+    onUpdateMessages((previous) => [
       ...previous,
-      {
-        id: Date.now(),
-        role: "user",
-        content: trimmed
-      }
+      { id: Date.now(), role: "user", content: trimmed }
     ]);
-
 
     try {
 
       setAsking(true);
 
-      const result =
-        await onAsk(
-          document.doc_id,
-          trimmed
-        );
+      const result = await onAsk(document.doc_id, trimmed);
 
-      setMessages((previous) => [
+      onUpdateMessages((previous) => [
         ...previous,
         {
           id: Date.now() + 1,
@@ -101,7 +58,7 @@ function ChatWindow({
 
     } catch (error) {
 
-      setMessages((previous) => [
+      onUpdateMessages((previous) => [
         ...previous,
         {
           id: Date.now() + 1,
@@ -114,9 +71,7 @@ function ChatWindow({
       ]);
 
     } finally {
-
       setAsking(false);
-
     }
   }
 
@@ -125,51 +80,30 @@ function ChatWindow({
 
     <motion.div
       className="chat-page"
-      initial={{
-        opacity: 0
-      }}
-      animate={{
-        opacity: 1
-      }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
       key={document.doc_id}
     >
 
       <header className="chat-header">
 
         <div className="active-document">
-
           <div className="active-document-icon">
             <FileText size={22} />
           </div>
-
           <div>
-
-            <h2>
-              {document.filename}
-            </h2>
-
-            <span>
-              {document.chunk_count || 0}
-              {" chunks • "}
-              {document.embedding_count || 0}
-              {" embeddings"}
-            </span>
-
+            <h2>{document.filename}</h2>
           </div>
-
         </div>
 
-
         <div className="ai-badge">
-
           <Sparkles size={15} />
-
           AI Ready
-
         </div>
 
       </header>
 
+      <MetadataBar document={document} />
 
       <div className="chat-messages">
 
@@ -177,66 +111,30 @@ function ChatWindow({
 
           <motion.div
             className="chat-welcome"
-            initial={{
-              opacity: 0,
-              y: 15
-            }}
-            animate={{
-              opacity: 1,
-              y: 0
-            }}
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
           >
-
             <div className="welcome-icon">
               <Sparkles size={25} />
             </div>
 
-            <h2>
-              Ask anything about this document
-            </h2>
+            <h2>Ask anything about this document</h2>
 
             <p>
-              I'll search through{" "}
-              <strong>
-                {document.filename}
-              </strong>{" "}
-              and answer using only its
-              contents.
+              I'll search through <strong>{document.filename}</strong>{" "}
+              and answer using only its contents.
             </p>
 
-
             <div className="suggestions">
-
-              <button
-                onClick={() =>
-                  setQuestion(
-                    "Summarize this document."
-                  )
-                }
-              >
+              <button onClick={() => setQuestion("Summarize this document.")}>
                 Summarize this document
               </button>
-
-              <button
-                onClick={() =>
-                  setQuestion(
-                    "What are the main topics discussed?"
-                  )
-                }
-              >
+              <button onClick={() => setQuestion("What are the main topics discussed?")}>
                 Main topics
               </button>
-
-              <button
-                onClick={() =>
-                  setQuestion(
-                    "What are the key takeaways?"
-                  )
-                }
-              >
+              <button onClick={() => setQuestion("What are the key takeaways?")}>
                 Key takeaways
               </button>
-
             </div>
 
           </motion.div>
@@ -244,108 +142,58 @@ function ChatWindow({
         ) : (
 
           <AnimatePresence initial={false}>
-
             {messages.map((message) => (
-
-              <MessageBubble
-                key={message.id}
-                message={message}
-              />
-
+              <MessageBubble key={message.id} message={message} />
             ))}
-
           </AnimatePresence>
 
         )}
-
 
         {asking && (
 
           <motion.div
             className="typing-message"
-            initial={{
-              opacity: 0,
-              y: 10
-            }}
-            animate={{
-              opacity: 1,
-              y: 0
-            }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
           >
-
-            <div className="avatar assistant-avatar">
-              ✦
-            </div>
-
+            <div className="avatar assistant-avatar">✦</div>
             <div className="typing-bubble">
-
-              <Loader2
-                size={17}
-                className="spin"
-              />
-
+              <Loader2 size={17} className="spin" />
               Searching document...
-
             </div>
-
           </motion.div>
 
         )}
-
 
         <div ref={messagesEndRef} />
 
       </div>
 
-
       <div className="chat-input-area">
 
-        <form
-          className="chat-form"
-          onSubmit={handleSubmit}
-        >
+        <form className="chat-form" onSubmit={handleSubmit}>
 
           <textarea
             value={question}
-            onChange={(event) =>
-              setQuestion(
-                event.target.value
-              )
-            }
+            onChange={(event) => setQuestion(event.target.value)}
             placeholder="Ask something about your document..."
             rows={1}
             disabled={asking}
             onKeyDown={(event) => {
-
-              if (
-                event.key === "Enter" &&
-                !event.shiftKey
-              ) {
-
+              if (event.key === "Enter" && !event.shiftKey) {
                 event.preventDefault();
-
                 handleSubmit(event);
-
               }
-
             }}
           />
-
 
           <motion.button
             type="submit"
             className="send-button"
-            disabled={
-              !question.trim() ||
-              asking
-            }
-            whileTap={{
-              scale: 0.9
-            }}
+            disabled={!question.trim() || asking}
+            whileTap={{ scale: 0.9 }}
           >
-
             <Send size={18} />
-
           </motion.button>
 
         </form>

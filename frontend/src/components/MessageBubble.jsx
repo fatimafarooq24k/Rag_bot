@@ -1,3 +1,5 @@
+import ReactMarkdown from "react-markdown";
+
 import {
   motion
 } from "framer-motion";
@@ -62,7 +64,13 @@ function MessageBubble({
 
         <div className="message-content">
 
-          {message.content}
+          {isUser ? (
+            message.content
+          ) : (
+            <ReactMarkdown>
+              {message.content}
+            </ReactMarkdown>
+          )}
 
         </div>
 

@@ -6,6 +6,7 @@ import logging
 import json
 from uuid import UUID
 import shutil
+import os
 
 from src.rag.generator import generate_answer
 from src.services.document_service import index_document
@@ -111,30 +112,88 @@ def get_document(doc_id: UUID):
         description = "Upload the document so the RAG process and index it.",
         response_model=DocumentMetadata
 )
-def index_pdf(file_upload: UploadFile = File(...)):
+async def index_pdf(file_upload: UploadFile = File(...)):
+    file_max_size = 100 * 1024 * 1024
+    chunk_size = 1024 * 1024
+    file_path = None
     try:
-        upload_folder = Path("data/raw")
-        upload_folder.mkdir(exist_ok = True, parents=True)
-
         if not file_upload.filename or file_upload.filename.isspace():
-            raise ValueError("File name invalid.")
+            raise HTTPException(
+                status_code=400,
+                detail="A file must be provided."
+            )
+        original_file_name = Path(file_upload.filename).name
 
-        if not file_upload.filename.lower().endswith(".pdf"):
-            raise ValueError("Please enter a pdf.")
+        if Path(original_file_name).suffix.lower() != ".pdf":
+            raise HTTPException(
+                status_code=400,
+                detail="Only .pdf file is accepted."
+            )
 
-        if file_upload.size > 100 * 1024 * 1024:
-            raise ValueError("Please enter a pdf smaller than 100MB.")
+        upload_folder = Path(settings.raw_folder)
+        upload_folder.mkdir(exist_ok=True, parents=True)
+
+        file_path = upload_folder / original_file_name
+
+        upload_folder_resolved = upload_folder.resolve()
+        file_path_resolved = file_path.resolve()
+
+        if not file_path_resolved.is_relative_to(upload_folder_resolved):
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid file path."
+            )
 
         logger.info("Starting document indexing...")
-        
-        file_path = upload_folder / Path(file_upload.filename).name
-        file_data = file_upload.file.read()
 
-        if not file_data:
-            raise ValueError("Please enter a pdf first.")
+        total_size = 0
+        pdf_signature = b""
 
         with open(file_path, "wb") as buffer:
-            buffer.write(file_data)
+            while True:
+                chunk = await file_upload.read(chunk_size)
+
+                if not chunk:
+                    break
+
+                total_size+=len(chunk)
+                if total_size > file_max_size:
+                    raise HTTPException(
+                        status_code=413,
+                        detail="File size must not exceed 100 MB limit."
+                    )
+
+                if total_size == 0:
+                    raise HTTPException(
+                        status_code=400,
+                        detail="The uploaded file is empty."
+                    )
+
+                
+                if len(pdf_signature) < 5:
+                    pdf_signature += chunk
+
+                buffer.write(chunk)
+
+
+
+        if total_size == 0:
+            if file_path.exists():
+                file_path.unlink()
+
+            raise HTTPException(
+                status_code=400,
+                detail="The uploaded file is empty."
+            )
+        if not pdf_signature.startswith(b"%PDF-"):
+            if file_path.exists():
+                file_path.unlink()
+
+            raise HTTPException(
+                status_code=400,
+                detail="The uploaded file is not a valid PDF."
+            )
+
 
         metadata = index_document(str(file_path))
 
@@ -145,16 +204,34 @@ def index_pdf(file_upload: UploadFile = File(...)):
 
         return metadata
     
+    except HTTPException:
+        if file_path and file_path.exists():
+            file_path.unlink()
+
+        raise
+
+
     except FileNotFoundError:
-        logger.exception("Required file was not found during indexing.")
+        logger.exception(
+            "Required file was not found during indexing."
+        )
+
+        if file_path and file_path.exists():
+            file_path.unlink()
 
         raise HTTPException(
             status_code=500,
             detail="A required file was not found while processing the document."
         )
 
+
     except Exception:
-        logger.exception("Unexpected error occurred while indexing document.")
+        logger.exception(
+            "Unexpected error occurred while indexing document."
+        )
+
+        if file_path and file_path.exists():
+            file_path.unlink()
 
         raise HTTPException(
             status_code=500,
@@ -162,7 +239,7 @@ def index_pdf(file_upload: UploadFile = File(...)):
         )
 
     finally:
-        file_upload.file.close()
+        await file_upload.close()
 
 
 @router.post(

@@ -62,7 +62,6 @@ def generate_answer(doc_id, query):
     7- If multiple pages support the same statement, cite them exactly like this:
     [Pages X, Y, Z]
     8- Never use any other citation style such as (Page 1), Page 1, 【1】, or superscripts.
-    9- Give the name of document from which you fetched answer in the format: Source (abc)
     Context:
     {context}
     

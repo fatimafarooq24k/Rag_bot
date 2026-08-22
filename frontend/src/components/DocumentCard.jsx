@@ -1,6 +1,4 @@
-import {
-  motion
-} from "framer-motion";
+import { motion } from "framer-motion";
 
 import {
   FileText,
@@ -8,10 +6,7 @@ import {
   CheckCircle
 } from "lucide-react";
 
-import {
-  formatFileSize,
-  formatDate
-} from "../utils/format";
+import { formatFileSize } from "../utils/format";
 
 
 function DocumentCard({
@@ -25,10 +20,9 @@ function DocumentCard({
 
     event.stopPropagation();
 
-    const confirmed =
-      window.confirm(
-        `Delete "${document.filename}"?`
-      );
+    const confirmed = window.confirm(
+      `Delete "${document.filename}"?`
+    );
 
     if (confirmed) {
       onDelete(document.doc_id);
@@ -40,61 +34,34 @@ function DocumentCard({
 
     <motion.div
       className={`document-card ${
-        selected
-          ? "document-card-selected"
-          : ""
+        selected ? "document-card-selected" : ""
       }`}
-      whileHover={{
-        x: 3
-      }}
-      whileTap={{
-        scale: 0.98
-      }}
-      onClick={() =>
-        onSelect(document)
-      }
+      whileHover={{ x: 3 }}
+      whileTap={{ scale: 0.98 }}
+      onClick={() => onSelect(document)}
       layout
     >
 
       <div className="document-icon">
-
         <FileText size={20} />
-
       </div>
 
 
       <div className="document-info">
 
-        <div
-          className="document-name"
-          title={document.filename}
-        >
+        <div className="document-name" title={document.filename}>
           {document.filename}
         </div>
 
         <div className="document-meta">
-
-          {formatFileSize(
-            document.file_size
-          )}
-
-          <span>•</span>
-
-          {document.chunk_count || 0}
-          {" chunks"}
-
+          {formatFileSize(document.file_size)}
         </div>
 
       </div>
 
 
       {selected && (
-
-        <CheckCircle
-          className="selected-icon"
-          size={17}
-        />
-
+        <CheckCircle className="selected-icon" size={17} />
       )}
 
 
